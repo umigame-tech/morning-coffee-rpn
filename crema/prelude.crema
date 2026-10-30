@@ -1,0 +1,86 @@
+# Crema standard prelude -- written in Crema itself.
+# Loaded automatically before every program.
+
+# ---- higher-order list words ------------------------------------------
+
+: map ( xs [f] -- ys )
+  -> f -> xs
+  { xs [ f call ] each } ;
+
+: filter ( xs [pred] -- ys )
+  -> pred -> xs
+  { xs [ dup pred call [ drop ] unless ] each } ;
+
+: reject ( xs [pred] -- ys )
+  -> pred [ pred call not ] filter ;
+
+: fold ( xs init [f] -- acc )
+  -> f swap [ f call ] each ;
+
+: count ( xs [pred] -- n )  filter len ;
+
+: any? ( xs [pred] -- bool )
+  -> pred false swap [ pred call or ] each ;
+
+: all? ( xs [pred] -- bool )
+  -> pred true swap [ pred call and ] each ;
+
+: find ( xs [pred] -- x|nil )
+  -> pred nil swap [ dup pred call [ nip break ] [ drop ] if ] each ;
+
+: each-with-index ( xs [f] -- )   # f receives: item index
+  -> f -> xs
+  0 xs len [ -> i  xs i get i f call ] for ;
+
+: sort-by ( xs [key] -- ys )
+  -> key -> xs
+  xs key map xs __sort-by-keys ;
+
+: zip ( xs ys -- pairs )
+  -> ys -> xs
+  { 0 xs len ys len min [ -> i { xs i get ys i get } ] for } ;
+
+: flatten ( xss -- xs )  -> xss { xss [ unpack ] each } ;
+
+: uniq ( xs -- ys )
+  -> xs  dict -> seen
+  { xs [ dup seen swap contains? [ drop ] [ dup seen swap true put drop ] if ] each } ;
+
+# ---- numbers -----------------------------------------------------------
+
+: sum     ( xs -- n )  0 [ + ] fold ;
+: product ( xs -- n )  1 [ * ] fold ;
+: max-of  ( xs -- x )  dup first [ max ] fold ;
+: min-of  ( xs -- x )  dup first [ min ] fold ;
+: square  ( n -- n )   dup * ;
+: between? ( n lo hi -- bool )  -> hi -> lo  dup lo >= swap hi <= and ;
+
+# ---- strings & output --------------------------------------------------
+
+: concat   ( xs -- str )      "" join ;
+: printf   ( fmt {args} -- )  format print ;
+: printfln ( fmt {args} -- )  format println ;
+: pad-left ( str width char -- str )
+  -> c -> w
+  [ dup len w < ] [ c swap + ] while ;
+: pad-right ( str width char -- str )
+  -> c -> w
+  [ dup len w < ] [ c + ] while ;
+
+# ---- stack ---------------------------------------------------------------
+
+: dip ( x [f] -- ? x )  swap -> x call x ;
+: keep ( x [f] -- ? x ) over -> x call x ;
+: bi ( x [f] [g] -- ? ? ) -> g -> f  dup f call swap g call ;
+
+# ---- testing -------------------------------------------------------------
+
+: assert-eq ( actual expected -- )
+  2dup = [ 2drop ] [
+    -> expected -> actual
+    "expected {} but got {}" { expected repr actual repr } format throw
+  ] if ;
+
+: assert-error ( [code] -- )   # passes only if code throws
+  [ call false ] [ drop true ] try
+  [ "expected an error, but none was raised" throw ] unless ;

@@ -1,0 +1,6 @@
+5
+caught: division by zero
+nil
+validation failed -> age must not be negative
+No such file or directory: no-such-file.txt
+unknown word 'undefined-word'

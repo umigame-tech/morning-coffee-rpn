@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Run Crema from a source checkout without installing it.
+here="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$here${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m crema "$@"

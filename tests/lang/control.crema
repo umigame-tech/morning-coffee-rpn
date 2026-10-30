@@ -1,0 +1,55 @@
+# Conditionals, loops, recursion, errors.
+
+: sign ( n -- s ) dup 0 < [ drop "neg" ] [ 0 = [ "zero" ] [ "pos" ] if ] if ;
+-3 sign "neg" assert-eq
+0 sign "zero" assert-eq
+8 sign "pos" assert-eq
+
+0 true [ 1 + ] when 1 assert-eq
+0 false [ 1 + ] when 0 assert-eq
+0 false [ 1 + ] unless 1 assert-eq
+
+# while
+0 -> i 0 -> total
+[ i 5 < ] [ total i + -> total  i 1 + -> i ] while
+total 10 assert-eq
+
+# times / for / for-step / each
+0 3 [ 2 + ] times 6 assert-eq
+{ 0 5 [ ] for } {0 1 2 3 4} assert-eq
+{ 10 0 -3 [ ] for-step } {10 7 4 1} assert-eq
+0 {1 2 3} [ + ] each 6 assert-eq
+{ "ab" [ ] each } {"a" "b"} assert-eq
+{ #{"k" 1} [ ] each } {{"k" 1}} assert-eq
+
+# loop & break, including break from a nested if
+{ 0 [ dup 3 = [ break ] when dup 1 + ] loop } {0 1 2 3} assert-eq
+{ {1 2 3 4} [ dup 3 = [ drop break ] [ ] if ] each } {1 2} assert-eq
+[ break ] assert-error
+
+# recursion
+: fact dup 1 <= [ drop 1 ] [ dup 1 - fact * ] if ;
+10 fact 3628800 assert-eq
+
+# mutual recursion (definitions are hoisted, so order does not matter)
+: is-even? dup 0 = [ drop true ] [ 1 - is-odd? ] if ;
+: is-odd?  dup 0 = [ drop false ] [ 1 - is-even? ] if ;
+10001 is-odd? true assert-eq
+
+# deep tail recursion runs in constant space
+: countdown dup 0 = [ ] [ 1 - countdown ] if ;
+300000 countdown 0 assert-eq
+
+# deep non-tail recursion does not overflow the host stack
+: sum-to dup 0 = [ ] [ dup 1 - sum-to + ] if ;
+100000 sum-to 5000050000 assert-eq
+
+# try / throw
+[ "boom" throw ] [ ] try "boom" assert-eq
+[ 1 2 "x" + ] [ "cannot apply" starts-with? ] try true assert-eq
+1 [ 2 3 "oops" throw ] [ drop ] try 1 assert-eq   # stack is restored
+[ [ "inner" throw ] [ "rethrown: " swap + throw ] try ] [ ] try "rethrown: inner" assert-eq
+[ nosuchword ] [ "unknown word 'nosuchword'" assert-eq ] try
+
+depth 0 assert-eq
+"control ok" println

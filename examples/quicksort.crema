@@ -1,0 +1,18 @@
+# Quicksort written with recursion and the higher-order words map/filter.
+
+: quicksort ( xs -- sorted )
+  dup len 1 <= [ ] [
+    -> xs
+    xs first -> pivot
+    xs rest -> others
+    others [ pivot < ] filter quicksort
+    { pivot }
+    others [ pivot >= ] filter quicksort
+    + +
+  ] if ;
+
+{ 33 4 15 8 42 16 23 1 4 } -> data
+"input:  {}" { data } printfln
+"sorted: {}" { data quicksort } printfln
+"words by length: {}" { "the quick brown fox jumps over a lazy dog" words [ len ] sort-by } printfln
+"sum of squares 1..10: {}" { 1 11 range [ square ] map sum } printfln

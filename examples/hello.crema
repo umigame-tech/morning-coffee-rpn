@@ -1,0 +1,9 @@
+# Hello, Crema!
+"Hello, world!" println
+
+# Everything is reverse Polish: operands first, then the operation.
+"1 2 + 3 * = " print  1 2 + 3 * println
+
+# Variables: `-> name` pops the top of the stack into `name`.
+"Crema" -> lang
+"Good morning from {}! ({} chars)" { lang lang len } printfln

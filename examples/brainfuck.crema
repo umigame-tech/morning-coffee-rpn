@@ -1,0 +1,41 @@
+# A Brainfuck interpreter written in Crema.
+#   crema examples/brainfuck.crema            runs the built-in hello world
+#   crema examples/brainfuck.crema prog.bf    runs a file
+
+: build-jumps ( code -- dict )   # matching bracket positions, both directions
+  -> code  dict -> jumps  {} -> open
+  0 code len [
+    -> i
+    code i get -> c
+    c "[" = [ open i append drop ] when
+    c "]" = [
+      open pop -> j drop
+      jumps i j put  j i put drop
+    ] when
+  ] for
+  jumps ;
+
+: run-bf ( code -- )
+  -> code
+  code build-jumps -> jumps
+  { 30000 [ 0 ] times } -> tape
+  0 -> ptr  0 -> pc
+  [ pc code len < ] [
+    code pc get -> c
+    c ">" = [ ptr 1 + -> ptr ] when
+    c "<" = [ ptr 1 - -> ptr ] when
+    c "+" = [ tape ptr  tape ptr get 1 + 256 mod  put drop ] when
+    c "-" = [ tape ptr  tape ptr get 1 - 256 mod  put drop ] when
+    c "." = [ tape ptr get chr print ] when
+    c "," = [ read-line dup nil = [ drop 0 ] [ dup empty? [ drop 10 ] [ first ord ] if ] if
+              -> ch  tape ptr ch put drop ] when
+    c "[" = [ tape ptr get 0 = [ jumps pc get -> pc ] when ] when
+    c "]" = [ tape ptr get 0 != [ jumps pc get -> pc ] when ] when
+    pc 1 + -> pc
+  ] while ;
+
+"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+-> hello
+
+args empty? [ hello ] [ args first read-file ] if
+run-bf

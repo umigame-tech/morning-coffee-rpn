@@ -1,0 +1,16 @@
+# Recursion: naive and tail-recursive Fibonacci, plus factorial with big integers.
+
+: fib ( n -- fib(n) )
+  dup 2 < [ ] [ dup 1 - fib swap 2 - fib + ] if ;
+
+# Tail calls do not grow the call stack, so this handles huge n.
+: fib-iter ( a b n -- fib )
+  dup 0 = [ drop drop ] [ -> n  swap over +  n 1 - fib-iter ] if ;
+: fast-fib ( n -- fib )  0 1 rot fib-iter ;
+
+: factorial ( n -- n! )
+  dup 1 <= [ drop 1 ] [ dup 1 - factorial * ] if ;
+
+0 15 [ -> i "fib({}) = {}" { i i fib } printfln ] for
+"fast-fib(200) = {}" { 200 fast-fib } printfln
+"30! = {}" { 30 factorial } printfln

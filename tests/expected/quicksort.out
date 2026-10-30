@@ -1,0 +1,4 @@
+input:  {33 4 15 8 42 16 23 1 4}
+sorted: {1 4 4 8 15 16 23 33 42}
+words by length: {"a" "the" "fox" "dog" "over" "lazy" "quick" "brown" "jumps"}
+sum of squares 1..10: 385

@@ -1,0 +1,14 @@
+# Error handling with try / throw.
+
+: safe-div ( a b -- n|nil )
+  [ / ] [ "caught: " swap + println nil ] try ;
+
+10 2 safe-div println
+1 0 safe-div println
+
+: check-age ( n -- n )
+  dup 0 < [ "age must not be negative" throw ] when ;
+
+[ -5 check-age ] [ "validation failed -> " swap + println ] try
+[ "no-such-file.txt" read-file ] [ println ] try
+[ undefined-word ] [ println ] try

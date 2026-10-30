@@ -1,0 +1,27 @@
+# An interactive RPN calculator, built with a dict of quotes.
+# Type expressions like `3 4 + 2 *`; `q` quits.  Try: echo "2 3 ** 1 -" | crema calc.crema
+
+#{
+  "+" [ + ]   "-" [ - ]   "*" [ * ]   "/" [ / ]
+  "**" [ ** ] "sqrt" [ sqrt ]  "neg" [ neg ]
+  "dup" [ dup ] "swap" [ swap ] "drop" [ drop ]
+} -> ops
+
+: calc-line ( line -- )
+  words [
+    -> tok
+    ops tok contains? [ ops tok get call ] [
+      tok num dup nil = [ drop "unknown token: " tok + throw ] when
+    ] if
+  ] each ;
+
+"rpn> " print
+[ read-line dup nil = [ drop break ] when
+  -> line
+  line trim "q" = [ break ] when
+  [ { line calc-line } -> results
+    results empty? [ "(empty)" ] [ results " " join ] if println ]
+  [ "error: " swap + println ] try
+  "rpn> " print
+] loop
+"" println
