@@ -1,0 +1,17 @@
+# A tiny `wc`: count lines, words and characters of the files given as arguments.
+#   crema examples/wc.crema README.md examples/*.crema
+
+: count-file ( path -- )
+  -> path
+  path read-file -> text
+  "{} {} {} {}" {
+    text lines len str 7 " " pad-left
+    text words len str 7 " " pad-left
+    text len str 8 " " pad-left
+    path
+  } printfln ;
+
+args empty? [
+  "usage: crema wc.crema FILE..." eprintln 1 exit
+] when
+args [ [ count-file ] [ "wc: " swap + eprintln ] try ] each

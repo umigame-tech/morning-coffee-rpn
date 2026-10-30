@@ -1,0 +1,88 @@
+# Strings, lists and dicts.
+
+# strings
+"hello" len 5 assert-eq
+"Hello" upper "HELLO" assert-eq
+"  pad  " trim "pad" assert-eq
+"a,b,c" "," split {"a" "b" "c"} assert-eq
+{1 2 3} "-" join "1-2-3" assert-eq
+"hello" 1 3 slice "el" assert-eq
+"hello" -3 100 slice "llo" assert-eq
+"hello" "ll" index-of 2 assert-eq
+"hello" "lo" contains? true assert-eq
+"a-b-a" "a" "x" replace "x-b-x" assert-eq
+"abc" reverse "cba" assert-eq
+"abc" 1 get "b" assert-eq
+"A" ord 65 assert-eq
+97 chr "a" assert-eq
+"ab" 3 * "ababab" assert-eq
+"{} + {} = {}" {1 2 3} format "1 + 2 = 3" assert-eq
+"{{}}" {} format "{}" assert-eq
+"line1\nline2" lines {"line1" "line2"} assert-eq
+"\u{3042}" "あ" assert-eq
+"7" 3 "0" pad-left "007" assert-eq
+
+# lists
+{ 1 2 + 4 } {3 4} assert-eq
+[1 2 3] len 3 assert-eq          # quotes double as literal lists
+{} 1 append 2 append {1 2} assert-eq
+{1 2 3} pop 3 assert-eq {1 2} assert-eq
+{1 2 3} 0 9 put {9 2 3} assert-eq
+{1 3} 1 2 insert {1 2 3} assert-eq
+{1 2 3} 0 remove {2 3} assert-eq
+{3 1 2} sort {1 2 3} assert-eq
+{1 2} {3} + {1 2 3} assert-eq
+1 5 range {1 2 3 4} assert-eq
+{1 2 3} first 1 assert-eq
+{1 2 3} last 3 assert-eq
+{1 2 3} rest {2 3} assert-eq
+{1 2 3} -1 get 3 assert-eq
+{ {1 2} unpack } {1 2} assert-eq
+1 2 3 3 pack {1 2 3} assert-eq
+{} empty? true assert-eq
+[ {1} 5 get ] assert-error
+
+# shared references, explicit copy
+{1 2} -> a  a -> b  b 3 append drop
+a {1 2 3} assert-eq
+a copy 4 append drop
+a len 3 assert-eq
+
+# higher-order words from the prelude
+{1 2 3} [ 10 * ] map {10 20 30} assert-eq
+1 7 range [ even? ] filter {2 4 6} assert-eq
+1 7 range [ even? ] reject {1 3 5} assert-eq
+{1 2 3 4} 0 [ + ] fold 10 assert-eq
+{1 2 3 4} sum 10 assert-eq
+{1 2 3 4} product 24 assert-eq
+{3 9 2} max-of 9 assert-eq
+{3 9 2} min-of 2 assert-eq
+{1 2 3} [ 2 > ] any? true assert-eq
+{1 2 3} [ 2 > ] all? false assert-eq
+{1 2 3} [ odd? ] count 2 assert-eq
+{5 6 7} [ 5 > ] find 6 assert-eq
+{5 6 7} [ 9 > ] find nil assert-eq
+{"ccc" "a" "bb"} [ len ] sort-by {"a" "bb" "ccc"} assert-eq
+{1 2} {"a" "b"} zip {{1 "a"} {2 "b"}} assert-eq
+{{1 2} {3}} flatten {1 2 3} assert-eq
+{1 2 1 3 2} uniq {1 2 3} assert-eq
+{ {"a" "b"} [ swap ] each-with-index } {0 "a" 1 "b"} assert-eq
+1 5 [ 1 + ] dip 5 assert-eq 2 assert-eq    # dip runs the quote under the top item
+5 [ 2 * ] keep 5 assert-eq 10 assert-eq
+
+# dicts
+#{"a" 1 "b" 2} -> d
+d "a" get 1 assert-eq
+d "zzz" get nil assert-eq
+d "c" 3 put drop
+d keys {"a" "b" "c"} assert-eq
+d values sum 6 assert-eq
+d "b" contains? true assert-eq
+d "b" remove "b" contains? false assert-eq
+d len 2 assert-eq
+#{ 1 2 + "three" } 3 get "three" assert-eq
+[ #{ 1 } ] assert-error
+[ dict {1} 2 put ] assert-error
+
+depth 0 assert-eq
+"collections ok" println

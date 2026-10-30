@@ -1,0 +1,21 @@
+# File I/O: write, append, read, and process a file.
+
+"crema-demo.txt" -> path
+
+"apple 3\nbanana 5\n" path write-file
+"cherry 7\n" path append-file
+
+"file exists? {}" { path file-exists? } printfln
+
+# Parse "name qty" lines into a dict and total the quantities.
+dict -> stock
+path read-lines [
+  words -> parts
+  stock  parts first  parts last int  put drop
+] each
+
+stock [ unpack -> qty -> name  "  {}: {}" { name qty } printfln ] each
+"total: {}" { stock values sum } printfln
+
+path delete-file
+"cleaned up, exists now? {}" { path file-exists? } printfln

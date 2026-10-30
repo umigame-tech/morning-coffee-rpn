@@ -1,0 +1,20 @@
+# File reading and writing. Uses the directory given as the first argument
+# (falls back to the current directory).
+
+args empty? [ "." ] [ args first ] if -> dir
+dir "/crema-test-file.txt" + -> path
+
+path file-exists? [ path delete-file ] when
+"first\n" path write-file
+"second\n" path append-file
+path read-file "first\nsecond\n" assert-eq
+path read-lines {"first" "second"} assert-eq
+path file-exists? true assert-eq
+{1 2} path write-file              # non-strings are written in printed form
+path read-file "{1 2}" assert-eq
+path delete-file
+path file-exists? false assert-eq
+[ path read-file ] assert-error
+
+depth 0 assert-eq
+"files ok" println

@@ -1,0 +1,45 @@
+# A small persistent TODO list manager.
+#   crema examples/todo.crema add "buy coffee beans"
+#   crema examples/todo.crema list
+#   crema examples/todo.crema done 1
+#   crema examples/todo.crema clear
+# Items are stored one per line as "x|text" (done) or " |text" (open).
+
+"TODO_FILE" getenv dup nil = [ drop "todo.txt" ] when -> db
+
+: load ( -- items )
+  db file-exists? [ db read-lines [ empty? not ] filter ] [ {} ] if ;
+
+: save ( items -- )
+  dup empty? [ drop "" ] [ "\n" join "\n" + ] if db write-file ;
+
+: show-items ( items -- )
+  dup empty? [ drop "nothing to do. enjoy your coffee!" println ] [
+    [ -> i -> item
+      item first "x" = "[x]" "[ ]" ?  -> mark
+      "{}. {} {}" { i 1 + str 2 " " pad-left  mark  item 2 100000 slice } printfln
+    ] each-with-index
+  ] if ;
+
+: usage ( -- )
+  "usage: todo.crema (list | add TEXT | done N | clear)" eprintln 1 exit ;
+
+args empty? [ { "list" } ] [ args ] if -> argv
+argv first -> cmd
+
+cmd "list" = [ load show-items ] when
+cmd "add" = [
+  argv len 2 < [ usage ] when
+  load " |" argv rest " " join + append save
+  "added." println
+] when
+cmd "done" = [
+  argv len 2 < [ usage ] when
+  load -> items
+  argv 1 get int 1 - -> n
+  n 0 < n items len >= or [ "no such item" eprintln 1 exit ] when
+  items n  "x|" items n get 2 100000 slice +  put save
+  "marked as done." println
+] when
+cmd "clear" = [ load [ first "x" = ] reject save "removed finished items." println ] when
+{ "list" "add" "done" "clear" } cmd contains? [ usage ] unless

@@ -1,0 +1,23 @@
+# Conditionals and loops.
+
+: fizzbuzz ( n -- str )
+  -> n
+  n 15 mod 0 = [ "FizzBuzz" ] [
+    n 3 mod 0 = [ "Fizz" ] [
+      n 5 mod 0 = [ "Buzz" ] [ n str ] if
+    ] if
+  ] if ;
+
+1 21 [ fizzbuzz println ] for
+
+# while loop: Collatz sequence of 27
+27 -> n  0 -> steps
+[ n 1 != ] [
+  n even? [ n 2 div ] [ n 3 * 1 + ] if -> n
+  steps 1 + -> steps
+] while
+"Collatz(27) reaches 1 after {} steps" { steps } printfln
+
+# loop/break: first power of two above 1000
+1 [ 2 * dup 1000 > [ break ] when ] loop -> p
+"first power of two above 1000: {}" { p } printfln

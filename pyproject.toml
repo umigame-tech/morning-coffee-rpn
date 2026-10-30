@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crema"
+version = "0.1.0"
+description = "A general-purpose, stack-based programming language in reverse Polish notation"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+[project.scripts]
+crema = "crema.cli:main"
+
+[tool.setuptools]
+packages = ["crema"]
+
+[tool.setuptools.package-data]
+crema = ["prelude.crema"]
